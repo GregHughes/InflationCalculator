@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BLS API</title>
+    <script type="module" src="lib/bls.js"></script>
+  </head>
+  <body>
+    <h1>Test data</h1>
+    <button onclick="getCPI();">Run Test</button>
+    <br />
+    <br />
+    <form>
+      <label for="startyear">Start Year:</label>
+      <input
+        type="number"
+        min="1913"
+        max="2023"
+        placeholder="Enter start year"
+        name="startyear"
+      />
+      <label for="endyear">End Year:</label>
+      <input
+        type="number"
+        min="1913"
+        max="2023"
+        placeholder="Enter end year"
+        name="endyear"
+      />
+      <button type="submit">Submit</button>
+    </form>
+  </body>
+</html>
