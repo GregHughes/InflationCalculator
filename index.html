@@ -1,33 +1,37 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Inflation Calculator</title>
     <meta charset="utf-8" />
-    <title>BLS API</title>
-    <script type="module" src="lib/bls.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="calculator.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
   </head>
   <body>
-    <h1>Test data</h1>
-    <button onclick="getCPI();">Run Test</button>
-    <br />
-    <br />
-    <form>
-      <label for="startyear">Start Year:</label>
-      <input
-        type="number"
-        min="1913"
-        max="2023"
-        placeholder="Enter start year"
-        name="startyear"
-      />
-      <label for="endyear">End Year:</label>
-      <input
-        type="number"
-        min="1913"
-        max="2023"
-        placeholder="Enter end year"
-        name="endyear"
-      />
-      <button type="submit">Submit</button>
-    </form>
+    <h1>Inflation Calculator</h1>
+    <div id="wrapper">
+      <form>
+        <label for="dollars">What is</label>
+        <input type="number" min="1" placeholder="$1" id="dollars" />
+        <label for="startyear">from</label>
+        <input
+          type="number"
+          min="1913"
+          max="currentYear"
+          placeholder="1913"
+          id="startYear"
+        />
+        <label for="endyear">worth in</label>
+        <input
+          type="number"
+          min="1913"
+          max="currentYear"
+          placeholder="2023"
+          id="endYear"
+        />
+      </form>
+      <button id="calc">Calculate</button>
+      <div id="generated"></div>
+    </div>
   </body>
 </html>
