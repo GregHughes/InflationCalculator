@@ -1,4 +1,7 @@
 // To Do
+// submit on enter
+// check input bounds
+// error handling with constructor
 // add swap button logic
 // draw graph with d3.js
 // add CSS gradient background w/ animations
@@ -26,12 +29,21 @@ const currentYear = date.getFullYear();
 
 // global elements
 const startYear = document.getElementById("startYear");
+startYear.addEventListener("focusout", focusOut);
+startYear.addEventListener("focusin", focusIn);
+
 const endYear = document.getElementById("endYear");
+endYear.addEventListener("focusout", focusOut);
+endYear.addEventListener("focusin", focusIn);
+
 const dollars = document.getElementById("dollars");
-const generated = document.getElementById("generated");
+dollars.addEventListener("focusout", focusOut);
+dollars.addEventListener("focusin", focusIn);
 
 const calcBtn = document.getElementById("calc");
 calcBtn.addEventListener("click", getCalc);
+
+const generated = document.getElementById("generated");
 
 // set input max and placeholder values to the latest full calendar year
 startYear.setAttribute("max", currentYear - 1);
@@ -41,6 +53,39 @@ endYear.setAttribute("placeholder", currentYear - 1);
 // API test
 // const testBtn = document.getElementById("test")
 // testBtn.addEventListener("click", getCPI);
+
+function focusOut() {
+  let currentInput = this.getAttribute("id");
+  let currentValue = this.value;
+
+  if (currentInput == "startYear" || "endYear") {
+    if (currentValue < 1913 || currentValue > currentYear - 1) {
+      this.setAttribute("class", "invalid");
+    }
+  }
+
+  if (currentInput == "dollars") {
+    if (currentValue < 1) {
+      this.setAttribute("class", "invalid");
+    }
+  }
+
+  console.log(currentInput);
+  console.log(currentValue);
+}
+
+function focusIn() {
+  this.value = "";
+  this.removeAttribute("class", "invalid");
+
+  // if (this.hasAttribute("id", "invalid")) {
+  //   this.removeAttribute("id", "invalid");
+  // }
+}
+
+function err() {
+  console.warn("err");
+}
 
 function getCalc(event) {
   event.preventDefault();
@@ -70,7 +115,7 @@ function getCalc(event) {
 
   let dollarsVal = Number(dollars.value);
   if (dollarsVal == "") {
-    dollarsVal = 1;
+    dollarsVal = 5;
   } else {
     dollarsVal = dollarsVal;
   }

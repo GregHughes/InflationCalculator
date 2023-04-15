@@ -12,12 +12,16 @@
     <div id="wrapper">
       <form>
         <label for="dollars">What is</label>
-        <input type="number" min="1" placeholder="$1" id="dollars" />
+        <div class="input-box">
+          <span class="prefix">$</span>
+          <input type="number" min="1" placeholder="5" id="dollars" />
+        </div>
         <label for="startyear">from</label>
         <input
           type="number"
           min="1913"
           max="currentYear"
+          onKeyPress="if(this.value.length==4) return false;"
           placeholder="1913"
           id="startYear"
         />
@@ -26,11 +30,12 @@
           type="number"
           min="1913"
           max="currentYear"
-          placeholder="2023"
+          onKeyPress="if(this.value.length==4) return false;"
+          placeholder="2022"
           id="endYear"
         />
       </form>
-      <button id="calc">Calculate</button>
+      <button id="calc" type="submit">Calculate</button>
       <div id="generated"></div>
     </div>
   </body>
