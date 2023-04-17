@@ -4,8 +4,8 @@
     <title>Inflation Calculator</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
     <script type="module" src="calculator.js"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
   </head>
   <body>
     <h1>Inflation Calculator</h1>
@@ -14,7 +14,13 @@
         <label for="dollars">What is</label>
         <div class="input-box">
           <span class="prefix">$</span>
-          <input type="number" min="1" placeholder="5" id="dollars" />
+          <input
+            class="input"
+            type="number"
+            min="1"
+            placeholder="5"
+            id="dollars"
+          />
         </div>
         <label for="startyear">from</label>
         <input
@@ -24,6 +30,7 @@
           onKeyPress="if(this.value.length==4) return false;"
           placeholder="1913"
           id="startYear"
+          class="input"
         />
         <label for="endyear">worth in</label>
         <input
@@ -33,10 +40,12 @@
           onKeyPress="if(this.value.length==4) return false;"
           placeholder="2022"
           id="endYear"
+          class="input"
         />
       </form>
-      <button id="calc" type="submit">Calculate</button>
+      <button id="submit" type="submit">Calculate</button>
       <div id="generated"></div>
+      <canvas id="chart"></canvas>
     </div>
   </body>
 </html>

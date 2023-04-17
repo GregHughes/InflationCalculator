@@ -1,9 +1,7 @@
 // To Do
-// submit on enter
-// check input bounds
+// destroy chart on each new submit
 // error handling with constructor
 // add swap button logic
-// draw graph with d3.js
 // add CSS gradient background w/ animations
 // add helper description button with links
 // clean up UI
@@ -23,25 +21,36 @@ const apiKey = "XXXXXXXXXXXXXXXXXXX";
 // endpoint is only used for current year's data
 const url = `${baseURL}${seriesId}?registrationkey=${apiKey}`;
 
+let wasChanged = false;
+
 // gets current year
 const date = new Date();
 const currentYear = date.getFullYear();
 
 // global elements
 const startYear = document.getElementById("startYear");
-startYear.addEventListener("focusout", focusOut);
-startYear.addEventListener("focusin", focusIn);
+startYear.addEventListener("focusout", validate);
+startYear.addEventListener("focusin", reset);
+startYear.addEventListener("input", didInput);
 
 const endYear = document.getElementById("endYear");
-endYear.addEventListener("focusout", focusOut);
-endYear.addEventListener("focusin", focusIn);
+endYear.addEventListener("focusout", validate);
+endYear.addEventListener("focusin", reset);
+endYear.addEventListener("input", didInput);
 
 const dollars = document.getElementById("dollars");
-dollars.addEventListener("focusout", focusOut);
-dollars.addEventListener("focusin", focusIn);
+dollars.addEventListener("focusout", validate);
+dollars.addEventListener("focusin", reset);
+dollars.addEventListener("input", didInput);
 
-const calcBtn = document.getElementById("calc");
+const calcBtn = document.getElementById("submit");
 calcBtn.addEventListener("click", getCalc);
+// press enter to submit form
+document.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    getCalc(e);
+  }
+});
 
 const generated = document.getElementById("generated");
 
@@ -50,45 +59,43 @@ startYear.setAttribute("max", currentYear - 1);
 endYear.setAttribute("max", currentYear - 1);
 endYear.setAttribute("placeholder", currentYear - 1);
 
-// API test
-// const testBtn = document.getElementById("test")
-// testBtn.addEventListener("click", getCPI);
+// flag set to true if user updates form input
+function didInput() {
+  wasChanged = true;
+}
 
-function focusOut() {
+// resets form input if previous input was invalid
+function reset() {
+  if (this.hasAttribute("class", "invalid")) {
+    this.value = "";
+    this.removeAttribute("class", "invalid");
+  } else {
+    this.select();
+  }
+}
+
+// validates form input if user updated value
+function validate() {
   let currentInput = this.getAttribute("id");
-  let currentValue = this.value;
+  let currentValue = Number(this.value);
 
-  if (currentInput == "startYear" || "endYear") {
-    if (currentValue < 1913 || currentValue > currentYear - 1) {
-      this.setAttribute("class", "invalid");
+  if (wasChanged && this.value != "") {
+    if (currentInput == "dollars") {
+      if (currentValue < 1) {
+        this.setAttribute("class", "invalid");
+      }
+    } else if (currentInput == "startYear" || "endYear") {
+      if (currentValue < 1913 || currentValue > currentYear - 1) {
+        this.setAttribute("class", "invalid");
+      }
     }
+    wasChanged = false;
   }
-
-  if (currentInput == "dollars") {
-    if (currentValue < 1) {
-      this.setAttribute("class", "invalid");
-    }
-  }
-
-  console.log(currentInput);
-  console.log(currentValue);
 }
 
-function focusIn() {
-  this.value = "";
-  this.removeAttribute("class", "invalid");
-
-  // if (this.hasAttribute("id", "invalid")) {
-  //   this.removeAttribute("id", "invalid");
-  // }
-}
-
-function err() {
-  console.warn("err");
-}
-
-function getCalc(event) {
-  event.preventDefault();
+// performs CPI calculations
+function getCalc(e) {
+  e.preventDefault();
 
   let startYearVal = Number(startYear.value);
 
@@ -131,14 +138,77 @@ function getCalc(event) {
   let displayDollars = `$${dollarsVal} in ${startYearVal} would be worth approximately $${dollarInflation} in ${endYearVal}.`;
   generated.innerHTML = displayDollars;
 
-  console.log("records: ", records);
-  console.log("dollarsVal", dollarsVal);
-  console.log("startAnnual: ", startAnnual);
-  console.log("endAnnual", endAnnual);
-  console.log("inflationRate", inflationRate);
-  console.log("dollarInflation", dollarInflation);
+  // let annuals = records.map((a) => Number(a.Annual));
+  // let min = Math.min(...annuals);
+  // let max = Math.max(...annuals);
+
+  draw(startYearVal, startAnnual, endYearVal, endAnnual, records);
+
+  // console.log("records: ", records);
+  // console.log("dollarsVal", dollarsVal);
+  // console.log("startAnnual: ", startAnnual);
+  // console.log("endAnnual", endAnnual);
+  // console.log("inflationRate", inflationRate);
+  // console.log("dollarInflation", dollarInflation);
 }
 
+// generates errors
+function err() {
+  console.warn("err");
+}
+
+// chart.js implementation
+function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
+  // clear previous chart
+
+  let years = [];
+
+  // generate label based on year inputs
+  let labels = () => {
+    for (let i = startYearVal; i <= endYearVal; i++) {
+      years.push(i);
+    }
+    if (years.length < 6) {
+      // for sparse year distance add extra
+      let labelStart = Math.min(...years) - 1;
+      let labelEnd = Math.max(...years) + 1;
+      years.push(labelEnd);
+      years.unshift(labelStart);
+      return years;
+    } else {
+      return years;
+    }
+  };
+
+  // generate data based on year inputs
+  let chartData = () => {
+    let annuals = [];
+    years.map((ya) => {
+      annuals.push(...records.filter((r) => r.Year == ya).map((a) => a.Annual));
+    });
+    return annuals;
+  };
+
+  new Chart(document.getElementById("chart"), {
+    type: "line",
+    data: {
+      labels: labels(),
+      datasets: [
+        {
+          data: chartData(),
+        },
+      ],
+    },
+  });
+}
+
+/**********************************************/
+
+// API test
+// const testBtn = document.getElementById("test")
+// testBtn.addEventListener("click", getCPI);
+
+// fetches CPI for current year if needed
 function getCPI() {
   fetch(url)
     .then((response) => response.json())
