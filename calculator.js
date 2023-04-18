@@ -1,7 +1,6 @@
 // To Do
-// destroy chart on each new submit
 // chart options - labels, domain display, colors and fonts, hover state, animation
-// error handling with constructor
+// error messaging
 // add swap button logic
 // add CSS gradient animation on calc
 // add helper description button with links
@@ -10,49 +9,55 @@
 
 import records from "./cpi.json" assert { type: "json" };
 
-// model filtering based off comment below
-// console.log("records: ",records)
-// console.log(...records.filter((r) => r.Year == 1992).map((a) => a.Annual));
-
-// series ID for the Consumer Price Index for All Urban Consumers: All Items (CPI-U)
-const seriesId = "CUUR0000SA0";
-const baseURL = "https://api.bls.gov/publicAPI/v2/timeseries/data/";
-const apiKey = "XXXXXXXXXXXXXXXXXXX";
-
-// endpoint is only used for current year's data
-const url = `${baseURL}${seriesId}?registrationkey=${apiKey}`;
-
-let wasChanged = false;
-
 // gets current year
 const date = new Date();
 const currentYear = date.getFullYear();
 
-// global elements
+// tracks form input
+let formChanged = false;
+
+// event listeners
 const startYear = document.getElementById("startYear");
 startYear.addEventListener("focusout", validate);
 startYear.addEventListener("focusin", reset);
 startYear.addEventListener("input", didInput);
+
+// input value as number
+let startYearVal = Number(startYear.value);
 
 const endYear = document.getElementById("endYear");
 endYear.addEventListener("focusout", validate);
 endYear.addEventListener("focusin", reset);
 endYear.addEventListener("input", didInput);
 
+// input value as number
+let endYearVal = Number(endYear.value);
+
 const dollars = document.getElementById("dollars");
 dollars.addEventListener("focusout", validate);
 dollars.addEventListener("focusin", reset);
 dollars.addEventListener("input", didInput);
 
+// input value as number
+let dollarsVal = Number(dollars.value);
+
 const calcBtn = document.getElementById("submit");
-calcBtn.addEventListener("click", getCalc);
+calcBtn.addEventListener("click", calculateInflation);
+
 // press enter to submit form
 document.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
-    getCalc(e);
+    calculateInflation(e);
   }
 });
 
+// canvas wrapper
+const chartWrapper = document.getElementById("chart-wrapper");
+
+// chart canvas
+const canvas = document.getElementById("chart");
+
+// element for innerHTML generation
 const generated = document.getElementById("generated");
 
 // set input max and placeholder values to the latest full calendar year
@@ -62,10 +67,32 @@ endYear.setAttribute("placeholder", currentYear - 1);
 
 // flag set to true if user updates form input
 function didInput() {
-  wasChanged = true;
+  formChanged = true;
 }
 
-// resets form input if previous input was invalid
+// validates input if user updated value on focusout
+// if no input, form can be submitted with default/placeholder values
+function validate() {
+  let currentInput = this.getAttribute("id");
+  let currentValue = Number(this.value);
+
+  if (formChanged && this.value != "") {
+    if (currentInput == "dollars") {
+      // dollar must be > 0
+      if (currentValue < 1) {
+        this.setAttribute("class", "invalid");
+      }
+    } else if (currentInput == "startYear" || "endYear") {
+      // records available from 1913 to last full calendar year
+      if (currentValue < 1913 || currentValue > currentYear - 1) {
+        this.setAttribute("class", "invalid");
+      }
+    }
+    formChanged = false;
+  }
+}
+
+// resets form input on selection if previous input was invalid
 function reset() {
   if (this.hasAttribute("class", "invalid")) {
     this.value = "";
@@ -75,73 +102,53 @@ function reset() {
   }
 }
 
-// validates form input if user updated value
-function validate() {
-  let currentInput = this.getAttribute("id");
-  let currentValue = Number(this.value);
-
-  if (wasChanged && this.value != "") {
-    if (currentInput == "dollars") {
-      if (currentValue < 1) {
-        this.setAttribute("class", "invalid");
-      }
-    } else if (currentInput == "startYear" || "endYear") {
-      if (currentValue < 1913 || currentValue > currentYear - 1) {
-        this.setAttribute("class", "invalid");
-      }
-    }
-    wasChanged = false;
-  }
-}
-
 // performs CPI calculations
-function getCalc(e) {
+function calculateInflation(e) {
   e.preventDefault();
 
-  let startYearVal = Number(startYear.value);
-
+  // default value if empty
   if (startYearVal == "") {
     startYearVal = 1913;
   } else {
     startYearVal = startYearVal;
   }
-
+  // retrieve annual CPI from records
   const startAnnual = Number(
     records.filter((r) => r.Year == startYearVal).map((a) => a.Annual)
   );
 
-  let endYearVal = Number(endYear.value);
+  // default value if empty
   if (endYearVal == "") {
     endYearVal = 2022;
   } else {
     endYearVal = endYearVal;
   }
 
+  // retrieve annual CPI from records
   const endAnnual = Number(
     records.filter((r) => r.Year == endYearVal).map((a) => a.Annual)
   );
 
-  let dollarsVal = Number(dollars.value);
+  // default value if empty
   if (dollarsVal == "") {
     dollarsVal = 5;
   } else {
     dollarsVal = dollarsVal;
   }
 
+  // calculate inflation rate
   const inflationRate = Number(
     (((endAnnual - startAnnual) / startAnnual) * 100).toFixed(3)
   );
 
+  // calculate dollar inflation
   const dollarInflation = Number(
     ((inflationRate / 100) * dollarsVal + dollarsVal).toFixed(2)
   );
 
+  // display inflation rate and dollar inflation
   let displayDollars = `$${dollarsVal} in ${startYearVal} would be worth approximately $${dollarInflation} in ${endYearVal}.`;
   generated.innerHTML = displayDollars;
-
-  // let annuals = records.map((a) => Number(a.Annual));
-  // let min = Math.min(...annuals);
-  // let max = Math.max(...annuals);
 
   draw(startYearVal, startAnnual, endYearVal, endAnnual, records);
 
@@ -153,15 +160,8 @@ function getCalc(e) {
   // console.log("dollarInflation", dollarInflation);
 }
 
-// generates errors
-function err() {
-  console.warn("err");
-}
-
 // chart.js implementation
 function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
-  // clear previous chart
-
   let years = [];
 
   // generate label based on year inputs
@@ -190,6 +190,14 @@ function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
     return annuals;
   };
 
+  // remove canvas if chart already drawn
+  if (canvas != null) {
+    canvas.remove();
+  }
+
+  // creates new canvas node
+  chartWrapper.innerHTML = '<canvas id="chart"></canvas>';
+
   new Chart(document.getElementById("chart"), {
     type: "line",
     color: "black",
@@ -203,32 +211,4 @@ function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
       ],
     },
   });
-}
-
-/**********************************************/
-
-// API test
-// const testBtn = document.getElementById("test")
-// testBtn.addEventListener("click", getCPI);
-
-// fetches CPI for current year if needed
-function getCPI() {
-  fetch(url)
-    .then((response) => response.json())
-    .then((data) => {
-      // parse response for current year's monthly values
-      const monthlyValues = data.Results.series[0].data
-        .filter((y) => y.year == currentYear.toString())
-        .map((v) => Number(v.value));
-
-      console.log("monthlyValues: ", monthlyValues);
-
-      // calculate the average for the current year
-      const currentYearAvg = monthlyValues.reduce((a, b) => a + b, 0);
-
-      console.log("currentYearAvg: ", currentYearAvg);
-
-      // calculate the inflation rate change between the two years
-    })
-    .catch((error) => console.error(error));
 }
