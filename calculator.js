@@ -1,10 +1,11 @@
 // To Do
 // destroy chart on each new submit
+// chart options - labels, domain display, colors and fonts, hover state, animation
 // error handling with constructor
 // add swap button logic
-// add CSS gradient background w/ animations
+// add CSS gradient animation on calc
 // add helper description button with links
-// clean up UI
+// clean up UI - font size, layout, colors
 // push to gh-pages
 
 import records from "./cpi.json" assert { type: "json" };
@@ -191,11 +192,13 @@ function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
 
   new Chart(document.getElementById("chart"), {
     type: "line",
+    color: "black",
     data: {
       labels: labels(),
       datasets: [
         {
           data: chartData(),
+          borderColor: "#FFFFFF",
         },
       ],
     },

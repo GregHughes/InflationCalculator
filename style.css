@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@500&family=Roboto:wght@500&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -10,18 +12,44 @@
 }
 
 html {
-    background: radial-gradient(ellipse at top, #e66465, transparent),
-        radial-gradient(ellipse at bottom, #4d9f0c, transparent);
+    /* background: radial-gradient(ellipse at top, #9333ea, transparent),
+        radial-gradient(ellipse at bottom, #16a34a, transparent),
+        radial-gradient(ellipse at right, #ea580c, transparent),
+        radial-gradient(ellipse at left, #db2777, transparent); */
+    background:
+        /* linear-gradient(#ea580c, transparent),
+        linear-gradient(to top left, #16a34a, transparent),
+        linear-gradient(to top right, #9333ea, transparent); */
+        linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    /* background-size: 400% 400%;
+
+    animation: gradient 15s ease infinite; */
 }
+
+/* @keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+} */
 
 body {
     height: 100vh;
+    font-family: 'Roboto', sans-serif;
 }
 
 h1 {
     margin: 15px;
     text-align: center;
     font-size: 45px;
+    font-family: 'Libre Franklin', sans-serif;
 }
 
 #wrapper {
@@ -44,7 +72,7 @@ input {
 input[type=number],
 input[type=text] {
     padding: 8px;
-    border-bottom: 2px solid gray;
+    border-bottom: 2px solid white;
     width: 100px;
 }
 
@@ -65,9 +93,11 @@ input.invalid {
 .input-box {
     display: flex;
     align-items: center;
-    border: 2px solid white;
-    border-radius: 4px;
     padding-left: 0.5rem;
+}
+
+::placeholder {
+    color: whitesmoke;
 }
 
 /* .input-box:focus-within {
@@ -76,11 +106,16 @@ input.invalid {
 
 
 #submit {
-    width: 100%;
-    padding: 5px 10px;
-    margin: 10px 20px;
-    height: 40px;
+    padding: 10px 25px;
+    margin: 10px 0px;
     background: transparent;
+    border: 2px solid white;
+    border-radius: 8px;
+}
+
+#submit:hover {
+    color: white;
+    cursor: pointer;
 }
 
 #chart {
