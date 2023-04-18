@@ -16,10 +16,10 @@
           <span class="prefix">$</span>
           <input
             class="input"
-            type="number"
-            min="1"
+            type="text"
             placeholder="5"
             id="dollars"
+            onKeyPress="if(this.value.length==10) return false;"
           />
         </div>
         <label for="startyear">from</label>

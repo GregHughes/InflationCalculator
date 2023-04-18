@@ -22,24 +22,16 @@ startYear.addEventListener("focusout", validate);
 startYear.addEventListener("focusin", reset);
 startYear.addEventListener("input", didInput);
 
-// input value as number
-let startYearVal = Number(startYear.value);
-
 const endYear = document.getElementById("endYear");
 endYear.addEventListener("focusout", validate);
 endYear.addEventListener("focusin", reset);
 endYear.addEventListener("input", didInput);
 
-// input value as number
-let endYearVal = Number(endYear.value);
-
 const dollars = document.getElementById("dollars");
 dollars.addEventListener("focusout", validate);
 dollars.addEventListener("focusin", reset);
 dollars.addEventListener("input", didInput);
-
-// input value as number
-let dollarsVal = Number(dollars.value);
+dollars.addEventListener("keyup", formatDollars);
 
 const calcBtn = document.getElementById("submit");
 calcBtn.addEventListener("click", calculateInflation);
@@ -68,6 +60,13 @@ endYear.setAttribute("placeholder", currentYear - 1);
 // flag set to true if user updates form input
 function didInput() {
   formChanged = true;
+}
+
+// formatt dollar value with commas and update input
+function formatDollars() {
+  this.value = this.value
+    .replace(/\D/g, "")
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 // validates input if user updated value on focusout
@@ -106,6 +105,11 @@ function reset() {
 function calculateInflation(e) {
   e.preventDefault();
 
+  // input values as numbers
+  let startYearVal = Number(startYear.value);
+  let endYearVal = Number(endYear.value);
+  let dollarsVal = Number(dollars.value.replaceAll(",", ""));
+
   // default value if empty
   if (startYearVal == "") {
     startYearVal = 1913;
@@ -143,21 +147,21 @@ function calculateInflation(e) {
 
   // calculate dollar inflation
   const dollarInflation = Number(
-    ((inflationRate / 100) * dollarsVal + dollarsVal).toFixed(2)
+    ((inflationRate / 100) * dollarsVal + dollarsVal).toFixed()
   );
 
   // display inflation rate and dollar inflation
-  let displayDollars = `$${dollarsVal} in ${startYearVal} would be worth approximately $${dollarInflation} in ${endYearVal}.`;
+  let displayDollars = `$${dollarsVal.toLocaleString()} in ${startYearVal} would have approximately the same buying power as $${dollarInflation.toLocaleString()} in ${endYearVal}.`;
   generated.innerHTML = displayDollars;
 
-  draw(startYearVal, startAnnual, endYearVal, endAnnual, records);
+  console.log("records: ", records);
+  console.log("dollarsVal", dollarsVal);
+  console.log("startAnnual: ", startAnnual);
+  console.log("endAnnual", endAnnual);
+  console.log("inflationRate", inflationRate);
+  console.log("dollarInflation", dollarInflation);
 
-  // console.log("records: ", records);
-  // console.log("dollarsVal", dollarsVal);
-  // console.log("startAnnual: ", startAnnual);
-  // console.log("endAnnual", endAnnual);
-  // console.log("inflationRate", inflationRate);
-  // console.log("dollarInflation", dollarInflation);
+  draw(startYearVal, startAnnual, endYearVal, endAnnual, records);
 }
 
 // chart.js implementation
@@ -205,10 +209,20 @@ function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
       labels: labels(),
       datasets: [
         {
+          label: "Annual CPI",
           data: chartData(),
           borderColor: "#FFFFFF",
         },
       ],
+    },
+    options: {
+      scales: {
+        y: {
+          ticks: {
+            max: "auto",
+          },
+        },
+      },
     },
   });
 }
