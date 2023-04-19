@@ -1,10 +1,10 @@
 // To Do
-// chart options - labels, domain display, colors and fonts, hover state, animation
+// mobile layout
 // error messaging
 // add swap button logic
 // add CSS gradient animation on calc
 // add helper description button with links
-// clean up UI - font size, layout, colors
+// clean up UI - font size, layout, color
 // push to gh-pages
 
 import records from "./cpi.json" assert { type: "json" };
@@ -147,7 +147,7 @@ function calculateInflation(e) {
 
   // calculate dollar inflation
   const dollarInflation = Number(
-    ((inflationRate / 100) * dollarsVal + dollarsVal).toFixed()
+    ((inflationRate / 100) * dollarsVal + dollarsVal).toFixed(2)
   );
 
   // display inflation rate and dollar inflation
@@ -167,10 +167,11 @@ function calculateInflation(e) {
 // chart.js implementation
 function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
   let years = [];
+  let values = [startYearVal, endYearVal];
 
   // generate label based on year inputs
   let labels = () => {
-    for (let i = startYearVal; i <= endYearVal; i++) {
+    for (let i = Math.min(...values); i <= Math.max(...values); i++) {
       years.push(i);
     }
     if (years.length < 6) {
@@ -179,10 +180,12 @@ function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
       let labelEnd = Math.max(...years) + 1;
       years.push(labelEnd);
       years.unshift(labelStart);
-      return years;
-    } else {
-      return years;
     }
+
+    // reverse chart labels if startyear is greater than endyear
+    startYearVal > endYearVal ? years.reverse() : years;
+
+    return years;
   };
 
   // generate data based on year inputs
@@ -205,6 +208,18 @@ function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
   new Chart(document.getElementById("chart"), {
     type: "line",
     color: "black",
+    options: {
+      borderColor: "#000000",
+      interaction: {
+        axis: "x",
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          display: true,
+        },
+      },
+    },
     data: {
       labels: labels(),
       datasets: [
@@ -212,17 +227,9 @@ function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
           label: "Annual CPI",
           data: chartData(),
           borderColor: "#FFFFFF",
+          backgroundColor: "#000000",
         },
       ],
-    },
-    options: {
-      scales: {
-        y: {
-          ticks: {
-            max: "auto",
-          },
-        },
-      },
     },
   });
 }
