@@ -3,62 +3,56 @@
 * {
     margin: 0;
     padding: 0;
-    font-size: 20px;
     border: none;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.3rem;
 }
 
 *:focus {
     outline: none;
 }
 
-html {
-    background:
-        /* linear-gradient(#ea580c, transparent),
-        linear-gradient(to top left, #16a34a, transparent),
-        linear-gradient(to top right, #9333ea, transparent); */
-        linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-}
-
-/* @keyframes gradient {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-} */
-
 body {
-    height: 100vh;
-    font-family: 'Roboto', sans-serif;
+    overflow-x: hidden;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background:
+        linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-attachment: fixed;
 }
 
 h1 {
     margin: 15px;
     text-align: center;
-    font-size: 45px;
+    font-size: 3rem;
     font-family: 'Libre Franklin', sans-serif;
 }
 
-#wrapper {
+#grid {
+    display: grid;
     text-align: center;
-    margin: 15px;
-    padding: 5px 25vw;
+    grid-template-columns: 1fr;
+    height: calc(100vh - 25em);
+    width: calc(100vw - 2em);
+    max-width: 1450px;
+    margin: 0 auto;
 }
 
 #chart-wrapper {
     margin-top: 20px;
+    min-height: 250px;
 }
 
 form {
     display: flex;
     align-items: center;
     justify-content: space-around;
+}
+
+form>* {
+    flex-basis: 200px;
 }
 
 input {
@@ -70,7 +64,7 @@ input[type=number],
 input[type=text] {
     padding: 8px;
     border-bottom: 2px solid white;
-    width: 100px;
+    width: 100%;
 }
 
 input[type=submit] {
@@ -97,17 +91,14 @@ input.invalid {
     color: whitesmoke;
 }
 
-/* .input-box:focus-within {
-    border-color: green;
-} */
-
 
 #submit {
     padding: 10px 25px;
-    margin: 10px 0px;
+    margin: 10px auto;
     background: transparent;
     border: 2px solid white;
     border-radius: 8px;
+    min-width: 250px;
 }
 
 #submit:hover {

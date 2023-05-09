@@ -1,11 +1,6 @@
 // To Do
 // mobile layout
-// error messaging
-// add swap button logic
-// add CSS gradient animation on calc
 // add helper description button with links
-// clean up UI - font size, layout, color
-// push to gh-pages
 
 import records from "./cpi.json" assert { type: "json" };
 
@@ -35,6 +30,7 @@ dollars.addEventListener("keyup", formatDollars);
 
 const calcBtn = document.getElementById("submit");
 calcBtn.addEventListener("click", calculateInflation);
+calcBtn.addEventListener("touchend", calculateInflation);
 
 // press enter to submit form
 document.addEventListener("keypress", (e) => {
@@ -209,6 +205,7 @@ function draw(startYearVal, startAnnual, endYearVal, endAnnual, records) {
     type: "line",
     color: "black",
     options: {
+      maintainAspectRatio: false,
       borderColor: "#000000",
       interaction: {
         axis: "x",

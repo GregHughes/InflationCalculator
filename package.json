@@ -1,8 +1,0 @@
-{
-  "name": "inflationcalculator",
-  "version": "1.1.0",
-  "description": "Calculate the value of the US dollar based of the CPI",
-  "main": "index.html",
-  "author": "Greg Hughes",
-  "license": "ISC"
-}
